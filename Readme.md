@@ -1,7 +1,3 @@
-Below is the English documentation you can include in your GitHub README.md file:
-
----
-
 # NG: Weight and Height Measurement System
 
 NG is a microcontroller-based system (compatible with Arduino, ESP8266, ESP32, or AVR boards) that integrates multiple sensors to measure weight and height. The system utilizes:

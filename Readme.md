@@ -2,9 +2,9 @@ Below is the English documentation you can include in your GitHub README.md file
 
 ---
 
-# NutriGrowth: Weight and Height Measurement System
+# NG: Weight and Height Measurement System
 
-NutriGrowth is a microcontroller-based system (compatible with Arduino, ESP8266, ESP32, or AVR boards) that integrates multiple sensors to measure weight and height. The system utilizes:
+NG is a microcontroller-based system (compatible with Arduino, ESP8266, ESP32, or AVR boards) that integrates multiple sensors to measure weight and height. The system utilizes:
 
 - **Load Cell with HX711 ADC** for weight measurement.
 - **Ultrasonic Sensor** (e.g., HC-SR04) for height measurement.
@@ -162,4 +162,4 @@ Special thanks to the contributors of the [HX711_ADC](https://github.com/olkal/H
 
 ---
 
-This documentation should help you understand, set up, and expand the NutriGrowth system. Happy building!
+This documentation should help you understand, set up, and expand the NG system. Happy building!

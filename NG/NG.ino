@@ -1,3 +1,6 @@
+#include <WiFiManager.h>
+#include <WiFiClientSecure.h>
+#include <PubSubClient.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <HX711_ADC.h>
@@ -26,6 +29,30 @@ float calibrationValue;
 
 int threshold = 65; // for touchpin
 long sensorHeight = 179;
+
+
+WiFiClientSecure secureClient;
+PubSubClient client(secureClient);
+const char* mqttServer = "9be5cf24a24746cb941ee516d217c43a.s1.eu.hivemq.cloud";
+const int mqttPort = 8883;
+const char* mqttUser = "NutriGrowth";
+const char* mqttPassword = "@NexSynar24";
+const char* mqttTopic = "device/nutrigrowth01/data";
+
+void callback(char* topic, byte* payload, unsigned int length) {}
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Connecting to MQTT...");
+    if (client.connect("ESP32Client", mqttUser, mqttPassword)) {
+      Serial.println("Connected");
+    } else {
+      Serial.print("Failed, rc=");
+      Serial.print(client.state());
+      delay(1000);
+    }
+  }
+}
 
 void calibrate() {
   Serial.println("Masukkan berat yang diketahui dalam kg (contoh: 1.5):");
@@ -78,7 +105,27 @@ void setup() {
 
   pinMode(TOUCH_PIN_MODE, INPUT_PULLDOWN);
   pinMode(TOUCH_PIN_TARE, INPUT_PULLDOWN);
+
+  WiFiManager wifiManager;
+  if (!wifiManager.autoConnect("NutriGrowthWiFi")) {
+    Serial.println("Gagal menghubungkan ke WiFi!");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Tambahkan WiFi");
+    delay(1000);
+    ESP.restart();
+  }
   
+  Serial.println("WiFi terhubung!");
+  Serial.println(WiFi.localIP());
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("WiFi Terhubung");
+  lcd.setCursor(0, 1);
+  lcd.print(WiFi.localIP());
+  delay(1000);
+  lcd.clear();
+
   // Inisialisasi LCD
   lcd.init();
   lcd.backlight();
@@ -171,9 +218,10 @@ void loop() {
 
   if (LoadCell.update()) newDataReady = true;
 
+  float weight;
   if (newDataReady) {
     if (millis() > t + serialPrintInterval) {
-      float weight = LoadCell.getData() / 1000.0; // Konversi ke kg
+      weight = LoadCell.getData() / 1000.0; // Konversi ke kg
 
       Serial.println(" cm");
       Serial.print("Load_cell output: ");
@@ -208,7 +256,13 @@ void loop() {
     lcd.print("BB: 0.000kg     ");
     lcd.clear();
   }
+
+  String payload = String("{\"device_id\":\"nutrigrowth01\",");
+  payload += "\"data\":{\"weight\":" + String(weight, 2) + ",";
+  payload += "\"height\":" + String(height) + "},";
+  payload += "\"timestamp\":\"" + String(millis()) + "\"}";
+
+  client.publish(mqttTopic, payload.c_str());
+
   delay(200);
 }
-
-//end

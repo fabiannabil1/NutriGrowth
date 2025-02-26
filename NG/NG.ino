@@ -88,7 +88,7 @@ void setup() {
   LoadCell.begin();
   EEPROM.get(calVal_eepromAddress, calibrationValue);
   if (calibrationValue == 0 || isnan(calibrationValue)) { // Jika EEPROM kosong
-    calibrationValue = 23.53; // Gunakan nilai default
+    calibrationValue = 20.90; // Gunakan nilai default
   }
 
   Serial.print("Nilai Kalibrasi dari EEPROM: ");
